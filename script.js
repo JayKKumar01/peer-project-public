@@ -34,19 +34,20 @@ function handleIncomingMessages(connection) {
         messagesList.appendChild(li);
         messagesList.scrollTop = messagesList.scrollHeight;
     });
+
+    connection.on('error', error => {
+        logMessage(`Connection error: ${error}`, true);
+    });
+
+    connection.on('close', () => {
+        logMessage('Connection closed.');
+    });
 }
 
 // Function to initialize the peer connection
 function initializePeer() {
-    fullPeerId = generatePeerId(); // Generate custom peer ID
-    // const peer = new Peer(fullPeerId, {
-    //     host: 'localhost',
-    //     port: 3000,
-    //     path: '/peerjs'
-    // });
+    fullPeerId = generatePeerId();
     const peer = new Peer(fullPeerId);
-    
-    
 
     peer.on('open', () => {
         peerIdDisplay.textContent = fullPeerId.split('-').pop(); // Display only the 6-digit number
@@ -64,6 +65,18 @@ function initializePeer() {
 
         // Handle incoming messages through a shared function
         handleIncomingMessages(conn);
+    });
+
+    peer.on('error', (error) => {
+        logMessage(`PeerJS error: ${error}`, true);
+    });
+
+    peer.on('disconnected', () => {
+        logMessage('Disconnected from PeerJS server.');
+    });
+
+    peer.on('close', () => {
+        logMessage('Peer connection closed.');
     });
 
     return peer; // Return the initialized peer object for usage
@@ -91,6 +104,11 @@ function connectToPeer(peer) {
                 connectionStatus.textContent = 'Error connecting';
                 logMessage('Error connecting to remote peer:', error, true);
             });
+
+            conn.on('close', () => {
+                connectionStatus.textContent = 'Connection closed';
+                logMessage('Connection closed.');
+            });
         }
     });
 }
@@ -107,6 +125,8 @@ function sendMessage() {
             messagesList.scrollTop = messagesList.scrollHeight;
             messageInput.value = '';
             logMessage(`Message sent to peer: ${message}`);
+        } else {
+            logMessage('Message not sent. No active connection or empty message.', true);
         }
     });
 }
