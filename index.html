@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerJS Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>PeerJS Chat</h1>
+
+        <div class="chat-box">
+            <h3>Your Peer ID: <span id="my-peer-id"></span></h3>
+            <p>Enter the Peer ID of the other user to connect:</p>
+            <input type="text" id="peer-id-input" placeholder="Enter Peer ID">
+            <button id="connect-btn" class="btn">Connect</button>
+            
+            <h3>Connection Status: <span id="connection-status">Not Connected</span></h3>
+            
+            <div class="messages">
+                <ul id="messages"></ul>
+            </div>
+
+            <div class="message-input">
+                <input type="text" id="message-input" placeholder="Type your message">
+                <button id="send-btn" class="btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Textarea to show log -->
+    <textarea id="peer-id-log" class="peer-id-log" readonly></textarea>
+
+    <!-- PeerJS version 1.5.4 -->
+    <script src="peerjs.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
