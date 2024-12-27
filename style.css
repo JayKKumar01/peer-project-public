@@ -7,6 +7,7 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    flex-direction: column;  /* Ensures layout stacks vertically on mobile */
 }
 
 .container {
@@ -14,11 +15,12 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    position: relative; /* Ensures proper layout when log area is adjusted */
 }
 
 .chat-box {
-    max-width: 500px;
-    margin: auto;
     text-align: center;
 }
 
@@ -31,25 +33,33 @@ body {
     overflow-y: auto;
 }
 
-.message-input input {
-    width: 80%;
-    padding: 10px;
-    border-radius: 5px;
+.message-input {
+    display: flex;
+    justify-content: space-between;
     margin-top: 10px;
-    border: 1px solid #ccc;
 }
 
-button {
-    padding: 10px 20px;
+.message-input input {
+    width: 75%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.message-input button {
+    width: 20%;
+    padding: 10px;
     background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background 0.3s ease;
+    font-size: 14px;
 }
 
-button:hover {
+.message-input button:hover {
     background-color: #218838;
 }
 
@@ -57,7 +67,7 @@ button:hover {
 .peer-id-log {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     background-color: #e2e3e5;
     color: #333;
     padding: 10px;
@@ -71,4 +81,33 @@ button:hover {
     resize: none;
     box-sizing: border-box;
     line-height: 1.4;
+    z-index: -1; /* Moves the log area behind the chat */
+}
+
+/* Responsive adjustment */
+@media (max-width: 600px) {
+    .message-input {
+        flex-direction: column;
+    }
+
+    .message-input input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .message-input button {
+        width: 100%;
+    }
+
+    /* Make sure the container and messages list are responsive */
+    .messages {
+        max-height: 200px;
+    }
+
+    /* Log area adjustment for mobile */
+    .peer-id-log {
+        width: 100%;
+        height: 150px;
+        bottom: 10px;
+    }
 }
