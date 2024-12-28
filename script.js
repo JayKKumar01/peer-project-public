@@ -22,18 +22,27 @@ function generatePeerId() {
 function logMessage(message, isError = false) {
     const logText = peerIdLog.value;
     peerIdLog.value = `${logText}\n${message}`;
+
+    // Force the scroll behavior to ensure it works on all devices
+    peerIdLog.style.overflowY = 'auto'; // Enable vertical scrolling if needed
     peerIdLog.scrollTop = peerIdLog.scrollHeight;
 
     peerIdLog.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
 }
 
+
 // Reusable function to handle incoming messages for both connected peers
 function handleIncomingMessages(connection) {
-    connection.on('data', data => {
-        const li = document.createElement('li');
-        li.textContent = `Peer: ${data}`;
-        messagesList.appendChild(li);
-        messagesList.scrollTop = messagesList.scrollHeight;
+    connection.on('open', function () {
+        connectionStatus.textContent = 'Connected';
+        logMessage('Connection established with remote peer.');
+
+        connection.on('data', data => {
+            const li = document.createElement('li');
+            li.textContent = `Peer: ${data}`;
+            messagesList.appendChild(li);
+            messagesList.scrollTop = messagesList.scrollHeight;
+        });
     });
 
     connection.on('error', error => {
@@ -70,22 +79,14 @@ function initializePeer() {
 
     peer.on('connection', incomingConn => {
         conn = incomingConn;
-        connectionStatus.textContent = 'Connected';
 
-        logMessage('Connection established with remote peer.');
+        logMessage('Incoming connection from '+conn.peer);
+
 
         // Handle incoming messages through a shared function
         handleIncomingMessages(conn);
 
-
-
-
-
-        const existingConnections = peer.connections[incomingConn.peer] || [];
-
-        const hasOpenConnection = existingConnections.some(
-            connection => connection.open
-        );
+        const hasOpenConnection = conn.open;
 
         logMessage("hasOpenConnection: " + hasOpenConnection);
 
@@ -182,7 +183,7 @@ function sendMessage() {
 }
 
 // Initialize the peer and connect to remote peer
-logMessage("Fixing bug 3");
+logMessage("Fixing bug 4");
 const peer = initializePeer();
 connectToPeer(peer);
 sendMessage();

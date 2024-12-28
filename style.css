@@ -106,8 +106,11 @@ body {
 
     /* Log area adjustment for mobile */
     .peer-id-log {
+        overflow-y: auto; /* Enable vertical scrolling */
+        word-wrap: break-word; /* Prevent long text from overflowing */
         width: 100%;
         height: 150px;
         bottom: 10px;
     }
+    
 }
