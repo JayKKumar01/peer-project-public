@@ -70,37 +70,49 @@ function initializePeer() {
     peer.on('connection', incomingConn => {
         conn = incomingConn;
         connectionStatus.textContent = 'Connected';
-    
+
         logMessage('Connection established with remote peer.');
-    
+
         // Handle incoming messages through a shared function
         handleIncomingMessages(conn);
-        
-        let len = peer.connections[incomingConn.peer]?.length;
-        logMessage("len of incoming: "+len);
-    
-        // Attempt to connect back to the peer that connected to this one
-        if (peer.connections[incomingConn.peer]?.length === 0) { // Check if there's no outgoing connection to the same peer
+
+
+
+
+
+        const existingConnections = peer.connections[incomingConn.peer] || [];
+
+        const hasOpenConnection = existingConnections.some(
+            connection => connection.open
+        );
+
+        logMessage("hasOpenConnection: " + hasOpenConnection);
+
+        if (!hasOpenConnection) {
+            // Attempt to connect back to the peer that connected to this one
             logMessage(`Attempting to connect back to peer: ${incomingConn.peer}`);
             const reverseConn = peer.connect(incomingConn.peer);
-    
+
             reverseConn.on('open', () => {
                 logMessage(`Reverse connection established with peer: ${incomingConn.peer}`);
             });
-    
+
             reverseConn.on('error', error => {
                 logMessage(`Reverse connection error: ${error}`, true);
             });
-    
+
             reverseConn.on('close', () => {
                 logMessage('Reverse connection closed.');
             });
-    
+
             // Handle messages in the reverse connection
             handleIncomingMessages(reverseConn);
         }
+
+
+
     });
-    
+
 
     peer.on('error', (error) => {
         logMessage(`PeerJS error: ${error}`, true);
@@ -167,7 +179,7 @@ function sendMessage() {
 }
 
 // Initialize the peer and connect to remote peer
-logMessage("Fixing bug 1");
+logMessage("Fixing bug 2");
 const peer = initializePeer();
 connectToPeer(peer);
 sendMessage();
