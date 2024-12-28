@@ -1,3 +1,4 @@
+// DOM Element References
 const peerIdDisplay = document.getElementById('my-peer-id');
 const peerIdInput = document.getElementById('peer-id-input');
 const connectBtn = document.getElementById('connect-btn');
@@ -7,124 +8,103 @@ const sendBtn = document.getElementById('send-btn');
 const messagesList = document.getElementById('messages');
 const peerIdLog = document.getElementById('peer-id-log');
 
+// logs for me
 
-logMessage("Fixing bug 5");
+logMessage("fixing bug 6");
 
+// Constants and Variables
 const prefix = 'JayKKumar01-PeerJS-';
 let conn;
-const fullPeerId = generatePeerId();
-const peer = new Peer(fullPeerId);
 
-peer.on('open', () => {
-    peerIdDisplay.textContent = fullPeerId.split('-').pop(); // Display only the 6-digit number
-    peer.peerID = fullPeerId; // Internally store the full generated ID
-    logMessage(`Your 6-digit Peer ID: ${peerIdDisplay.textContent}`);
-});
+// Utility Functions
 
-peer.on('connection', incomingConn => {
-    conn = incomingConn;
-    logMessage('Incoming connection from ' + conn.peer);
-    // Handle incoming messages through a shared function
-    handleIncomingMessages(conn);
-});
-
-peer.on('error', (error) => {
-    logMessage(`PeerJS error: ${error}`, true);
-});
-
-peer.on('disconnected', () => {
-    logMessage('Disconnected from PeerJS server.');
-});
-
-peer.on('close', () => {
-    logMessage('Peer connection closed.');
-});
-
-// Function to initiate connection with another peer
-connectBtn.addEventListener('click', () => {
-    const remotePeerId = peerIdInput.value.trim();
-
-    if (remotePeerId) {
-        const fullRemotePeerId = prefix + remotePeerId;
-        logMessage(`Trying to connect to peer with ID: ${fullRemotePeerId}`);
-
-        conn = peer.connect(fullRemotePeerId);
-
-        conn.on('open', () => {
-            connectionStatus.textContent = 'Connected';
-            logMessage('Connection established with remote peer.');
-        });
-
-        // Handle incoming messages through a shared function
-        handleIncomingMessages(conn);
-
-        conn.on('error', error => {
-            connectionStatus.textContent = 'Error connecting';
-            logMessage('Error connecting to remote peer:', error, true);
-        });
-
-        conn.on('close', () => {
-            connectionStatus.textContent = 'Connection closed';
-            logMessage('Connection closed.');
-        });
-    }
-});
-
-// Function to handle sending a message to the remote peer
-sendBtn.addEventListener('click', () => {
-    const message = messageInput.value.trim();
-    if (message && conn) {
-        conn.send(message);
-        const li = document.createElement('li');
-        li.textContent = `You: ${message}`;
-        messagesList.appendChild(li);
-        messagesList.scrollTop = messagesList.scrollHeight;
-        messageInput.value = '';
-        logMessage(`Message sent to peer: ${message}`);
-    } else {
-        logMessage('Message not sent. No active connection or empty message.', true);
-    }
-});
-
-
-// Function to generate a random 6-digit code appended to the custom prefix
+// Generate a random 6-digit code appended to the custom prefix
 function generatePeerId() {
-    const randomCode = Math.floor(100000 + Math.random() * 900000); // 6-digit random code
-    return prefix + randomCode;
+    return prefix + Math.floor(100000 + Math.random() * 900000); // 6-digit random code
 }
 
-// Log function to handle appending messages and setting log background color
+// Log messages with optional error styling
 function logMessage(message, isError = false) {
-    const logText = peerIdLog.value;
-    peerIdLog.value = `${logText}\n${message}`;
-
-    // Force the scroll behavior to ensure it works on all devices
-    peerIdLog.style.overflowY = 'auto'; // Enable vertical scrolling if needed
-    peerIdLog.scrollTop = peerIdLog.scrollHeight;
-
+    peerIdLog.value += `\n${message}`;
+    peerIdLog.scrollTop = peerIdLog.scrollHeight; // Scroll to the latest log
     peerIdLog.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
 }
 
-
-// Reusable function to handle incoming messages for both connected peers
+// Handle incoming messages for both connected peers
 function handleIncomingMessages(connection) {
-    connection.on('open', function () {
+    connection.on('open', () => {
         connectionStatus.textContent = 'Connected';
         logMessage('Connection established with remote peer.');
-
-        connection.on('data', data => {
-            const li = document.createElement('li');
-            li.textContent = `Peer: ${data}`;
-            messagesList.appendChild(li);
-            messagesList.scrollTop = messagesList.scrollHeight;
-        });
     });
 
-    connection.on('error', error => {
-        logMessage(`Connection error: ${error}`, true);
+    connection.on('data', (data) => {
+        const li = document.createElement('li');
+        li.textContent = `Peer: ${data}`;
+        messagesList.appendChild(li);
+        messagesList.scrollTop = messagesList.scrollHeight; // Auto-scroll to latest message
     });
 
-    connection.on('close', () => {
+    connection.on('error', (error) => logMessage(`Connection error: ${error}`, true));
+    connection.on('close', () => logMessage('Connection closed.'));
+}
+
+// Initialize PeerJS
+const fullPeerId = generatePeerId();
+const peer = new Peer(fullPeerId);
+
+// PeerJS Event Handlers
+peer.on('open', () => {
+    peerIdDisplay.textContent = fullPeerId.split('-').pop(); // Display only the 6-digit ID
+    logMessage(`Your 6-digit Peer ID: ${peerIdDisplay.textContent}`);
+});
+
+peer.on('connection', (incomingConn) => {
+    conn = incomingConn;
+    logMessage(`Incoming connection from: ${conn.peer.split('-').pop()}`);
+    handleIncomingMessages(conn);
+});
+
+peer.on('error', (error) => logMessage(`PeerJS error: ${error}`, true));
+peer.on('disconnected', () => logMessage('Disconnected from PeerJS server.'));
+peer.on('close', () => logMessage('Peer connection closed.'));
+
+// Event Listeners
+
+// Initiate connection with another peer
+connectBtn.addEventListener('click', () => {
+    const remotePeerId = peerIdInput.value.trim();
+    if (!remotePeerId) return;
+
+    const fullRemotePeerId = prefix + remotePeerId;
+    logMessage(`Trying to connect with ID: ${remotePeerId}`);
+
+    conn = peer.connect(fullRemotePeerId);
+    handleIncomingMessages(conn);
+
+    conn.on('error', (error) => {
+        connectionStatus.textContent = 'Error connecting';
+        logMessage(`Error connecting to remote peer: ${error}`, true);
+    });
+
+    conn.on('close', () => {
+        connectionStatus.textContent = 'Connection closed';
         logMessage('Connection closed.');
     });
-}
+});
+
+// Send message to the connected peer
+sendBtn.addEventListener('click', () => {
+    const message = messageInput.value.trim();
+    if (!message || !conn) {
+        logMessage('Message not sent. No active connection or empty message.', true);
+        return;
+    }
+
+    conn.send(message);
+    const li = document.createElement('li');
+    li.textContent = `You: ${message}`;
+    messagesList.appendChild(li);
+    messagesList.scrollTop = messagesList.scrollHeight;
+    messageInput.value = ''; // Clear the input field
+    logMessage(`Message sent to peer: ${message}`);
+});
