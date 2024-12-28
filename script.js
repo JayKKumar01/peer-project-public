@@ -13,6 +13,35 @@ Object.defineProperty(document, "cookie", {
     },
 });
 
+// Function to keep the screen awake
+async function keepScreenAwake() {
+    try {
+        if ('wakeLock' in navigator) {
+            const wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Screen wake lock is active.');
+
+            // Handle visibility change (release wake lock if page is hidden)
+            document.addEventListener('visibilitychange', async () => {
+                if (document.visibilityState === 'visible') {
+                    await navigator.wakeLock.request('screen');
+                    console.log('Screen wake lock restored.');
+                } else {
+                    wakeLock.release();
+                    console.log('Screen wake lock released.');
+                }
+            });
+        } else {
+            console.warn('Wake Lock API is not supported on this browser.');
+        }
+    } catch (err) {
+        console.error('Failed to acquire wake lock:', err);
+    }
+}
+
+// Call the function when the website is loaded
+keepScreenAwake();
+
+
 // DOM Element References
 const peerIdDisplay = document.getElementById('my-peer-id');
 const peerIdInput = document.getElementById('peer-id-input');
@@ -25,7 +54,8 @@ const peerIdLog = document.getElementById('peer-id-log');
 
 // logs for me
 
-logMessage("fixing bug 7");
+logMessage("fixing bug 8");
+
 
 // Constants and Variables
 const prefix = 'JayKKumar01-PeerJS-';
