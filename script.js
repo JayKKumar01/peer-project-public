@@ -57,15 +57,50 @@ function initializePeer() {
         logMessage(`Your 6-digit Peer ID: ${peerIdDisplay.textContent}`);
     });
 
+    // peer.on('connection', incomingConn => {
+    //     conn = incomingConn;
+    //     connectionStatus.textContent = 'Connected';
+
+    //     logMessage('Connection established with remote peer.');
+
+    //     // Handle incoming messages through a shared function
+    //     handleIncomingMessages(conn);
+    // });
+
     peer.on('connection', incomingConn => {
         conn = incomingConn;
         connectionStatus.textContent = 'Connected';
-
+    
         logMessage('Connection established with remote peer.');
-
+    
         // Handle incoming messages through a shared function
         handleIncomingMessages(conn);
+        
+        let len = peer.connections[incomingConn.peer]?.length;
+        logMessage("len of incoming: "+len);
+    
+        // Attempt to connect back to the peer that connected to this one
+        if (peer.connections[incomingConn.peer]?.length === 0) { // Check if there's no outgoing connection to the same peer
+            logMessage(`Attempting to connect back to peer: ${incomingConn.peer}`);
+            const reverseConn = peer.connect(incomingConn.peer);
+    
+            reverseConn.on('open', () => {
+                logMessage(`Reverse connection established with peer: ${incomingConn.peer}`);
+            });
+    
+            reverseConn.on('error', error => {
+                logMessage(`Reverse connection error: ${error}`, true);
+            });
+    
+            reverseConn.on('close', () => {
+                logMessage('Reverse connection closed.');
+            });
+    
+            // Handle messages in the reverse connection
+            handleIncomingMessages(reverseConn);
+        }
     });
+    
 
     peer.on('error', (error) => {
         logMessage(`PeerJS error: ${error}`, true);
