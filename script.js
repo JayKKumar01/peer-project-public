@@ -10,6 +10,7 @@ const peerIdLog = document.getElementById('peer-id-log');
 const prefix = 'JayKKumar01-PeerJS-';
 let conn;
 let fullPeerId; // Full peer ID with prefix
+let count = 0;
 
 // Function to generate a random 6-digit code appended to the custom prefix
 function generatePeerId() {
@@ -88,7 +89,7 @@ function initializePeer() {
 
         logMessage("hasOpenConnection: " + hasOpenConnection);
 
-        if (!hasOpenConnection) {
+        if (!hasOpenConnection && count++ === 0) {
             // Attempt to connect back to the peer that connected to this one
             logMessage(`Attempting to connect back to peer: ${incomingConn.peer}`);
             const reverseConn = peer.connect(incomingConn.peer);
@@ -135,10 +136,12 @@ function connectToPeer(peer) {
         const remotePeerId = peerIdInput.value.trim();
 
         if (remotePeerId) {
+            count++;
             const fullRemotePeerId = prefix + remotePeerId;
             logMessage(`Trying to connect to peer with ID: ${fullRemotePeerId}`);
 
             conn = peer.connect(fullRemotePeerId);
+
             conn.on('open', () => {
                 connectionStatus.textContent = 'Connected';
                 logMessage('Connection established with remote peer.');
@@ -179,7 +182,7 @@ function sendMessage() {
 }
 
 // Initialize the peer and connect to remote peer
-logMessage("Fixing bug 2");
+logMessage("Fixing bug 3");
 const peer = initializePeer();
 connectToPeer(peer);
 sendMessage();
