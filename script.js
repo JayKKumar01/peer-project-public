@@ -167,6 +167,7 @@ function sendMessage() {
 }
 
 // Initialize the peer and connect to remote peer
+logMessage("Fixing bug 1");
 const peer = initializePeer();
 connectToPeer(peer);
 sendMessage();
