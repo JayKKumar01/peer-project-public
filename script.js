@@ -1,18 +1,3 @@
-// Clear existing cookies
-document.cookie.split(";").forEach((cookie) => {
-    const [name] = cookie.split("=");
-    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-});
-
-// Override document.cookie to prevent cookies from being set
-Object.defineProperty(document, "cookie", {
-    configurable: false,
-    get: () => "",
-    set: () => {
-        console.warn("Attempt to set a cookie was blocked.");
-    },
-});
-
 // Function to keep the screen awake
 async function keepScreenAwake() {
     try {
@@ -54,7 +39,7 @@ const peerIdLog = document.getElementById('peer-id-log');
 
 // logs for me
 
-logMessage("fixing bug 8");
+logMessage("fixing bug 9");
 
 
 // Constants and Variables
