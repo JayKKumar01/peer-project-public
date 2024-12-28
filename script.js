@@ -1,3 +1,18 @@
+// Clear existing cookies
+document.cookie.split(";").forEach((cookie) => {
+    const [name] = cookie.split("=");
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+});
+
+// Override document.cookie to prevent cookies from being set
+Object.defineProperty(document, "cookie", {
+    configurable: false,
+    get: () => "",
+    set: () => {
+        console.warn("Attempt to set a cookie was blocked.");
+    },
+});
+
 // DOM Element References
 const peerIdDisplay = document.getElementById('my-peer-id');
 const peerIdInput = document.getElementById('peer-id-input');
@@ -10,7 +25,7 @@ const peerIdLog = document.getElementById('peer-id-log');
 
 // logs for me
 
-logMessage("fixing bug 6");
+logMessage("fixing bug 7");
 
 // Constants and Variables
 const prefix = 'JayKKumar01-PeerJS-';
